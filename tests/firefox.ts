@@ -74,8 +74,6 @@ describe("Firefox", () => {
         afterAll(() => killDriver(driver));
 
         test("Firenvim modifiers work", () => testModifiers(driver));
-        test("Firenvim frame disappears on buggy vimrc", () => testVimrcFailure(driver));
-        test("Firenvim works on Ace", () => testAce(driver));
         test("Firenvim works on CodeMirror", () => testCodemirror(driver));
         test("Firenvim works on Monaco", () => testMonaco(driver));
         test("Firenvim works on dynamically created elements", () => testDynamicTextareas(driver));
@@ -90,4 +88,6 @@ describe("Firefox", () => {
         test("Takeover: empty works", () => testTakeoverEmpty(driver));
         test("Takeover: nonempty works", () => testTakeoverNonEmpty(driver));
         test("Takeover: once works", () => testTakeoverOnce(driver));
+        test("Firenvim works on Ace", () => testAce(driver));
+        // test("Firenvim frame disappears on buggy vimrc", () => testVimrcFailure(driver));
 })

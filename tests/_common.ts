@@ -9,7 +9,7 @@ import { readVimrc, writeVimrc } from "./_vimrc";
 
 jest.setTimeout(15000);
 const keyDelay = 50;
-const FIRENVIM_INIT_DELAY = 450;
+const FIRENVIM_INIT_DELAY = 500;
 
 export const pagesDir = path.resolve(path.join("tests", "pages"));
 export const extensionDir = path.resolve("target");
@@ -184,7 +184,10 @@ export async function testAce(driver: any) {
         console.log("Waiting for span to be removed from page…");
         await driver.wait(Until.stalenessOf(span));
         console.log("Waiting for value update…");
-        await driver.wait(async () => /some textTest/.test(await input.getAttribute("innerText")));
+        await driver.wait(async () => {
+                console.log(await input.getAttribute("innerText"));
+                return /some textTest/.test(await input.getAttribute("innerText"))
+        });
 }
 
 export async function testMonaco(driver: any) {
@@ -266,13 +269,10 @@ export async function killPreloadedInstance(driver: any) {
                 txtarea.scrollIntoView(true);`);
         const txtarea = await driver.wait(Until.elementLocated(By.id(id)));
         await driver.actions().click(txtarea).perform();
-        await driver.actions()
-                .keyDown(webdriver.Key.CONTROL)
-                .keyDown("e")
-                .pause(keyDelay)
-                .keyUp("e")
-                .keyUp(webdriver.Key.CONTROL)
-                .perform();
+        await sendKeys(driver, ["a"]);
+        const body = await driver.wait(Until.elementLocated(By.id("body")));
+        await driver.actions().click(body).perform();
+        await driver.actions().click(txtarea).perform();
         await driver.sleep(FIRENVIM_INIT_DELAY);
         await driver.executeScript(`
                 const elem = document.getElementById("${id}");
@@ -441,10 +441,11 @@ ${backup}
         console.log("Waiting for span to be created…");
         let span = await driver.wait(Until.elementLocated(By.css("body > span:nth-child(2)")));
         await driver.sleep(FIRENVIM_INIT_DELAY);
-        await writeVimrc(backup);
         console.log("Typing :q!<CR>…");
         await sendKeys(driver, ":q!".split("")
                 .concat(webdriver.Key.ENTER));
+        await driver.wait(Until.stalenessOf(span));
+        await writeVimrc(backup);
         console.log("Focusing body…");
         const body = await driver.wait(Until.elementLocated(By.id("body")));
         await driver.actions().click(body).perform();
